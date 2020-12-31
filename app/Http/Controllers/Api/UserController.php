@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Auth;
 
 class UserController extends Controller
 {
@@ -32,7 +33,23 @@ class UserController extends Controller
 	 */
     public function login(Request $request)
     {
-    	return $request->all();
+    	$credentials = $request->validate([
+    		'email' => ['required'],
+    		'password' => ['required'],
+    	]);
+
+    	// Checking user credentials
+    	if (!Auth::attempt($credentials)) {
+    		return response(['message' => 'Invalid credentials!']);
+    	}
+
+    	$token = Auth::user()->createToken('authToken')->accessToken;
+
+    	return response([
+    		'user' => Auth::user(),
+    		'accessToken' => 'Bearer '.$token
+    	]);
+
     }
 
 	/**
