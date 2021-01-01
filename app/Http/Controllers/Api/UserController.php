@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Password;
 use Auth;
 
 class UserController extends Controller
@@ -60,7 +61,22 @@ class UserController extends Controller
 	 */
     public function forgotPassword(Request $request)
     {
-    	return $request->all();
+        $credentials = $request->validate([
+            'email' => ['required'],
+        ]);
+
+    	$user = User::where('email', $request->email)->first();
+
+        if ($user != NULL) {
+            Password::sendResetLink($credentials);
+            return response([
+                'message' => 'Email with reset password link has been sent.'
+            ]);
+        }
+
+        return response([
+            'message' => 'User does not exist in our database'
+        ]);
     }
 
 }
