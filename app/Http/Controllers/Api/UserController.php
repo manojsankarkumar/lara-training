@@ -23,7 +23,10 @@ class UserController extends Controller
     	]);
 
     	$request['password'] = bcrypt($request->password);
-    	return User::create($request->all());
+        
+    	return response([
+            'message' => 'User has been registered successfully'
+        ]);
     }
 
 	/**
